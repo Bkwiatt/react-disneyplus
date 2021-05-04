@@ -1,37 +1,67 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import db from '../firebase'
+import { useParams } from 'react-router-dom'
 
 function Detail() {
+    const { id } = useParams();
+    const [movie, setMovie] = useState()
+
+    useEffect(() => {
+        db.collection("movies")
+        .doc(id)
+        .get()
+        .then((doc) => {
+            if(doc.exists){
+                setMovie(doc.data())
+            } else {
+                console.log("fail")
+            }
+        })
+    }, [id])
+
+
+
     return (
         <Container>
+        {movie && (
+            <>
             <Background>
-                <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg" />
+                <img src={movie.backgroundImg} alt="bg"/>
             </Background>
             <ImageTitle>
-                <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1440&aspectRatio=1.78" />
+                <img src={movie.titleImg} alt="imgtitle"/>
             </ImageTitle>
             <Controls>
                 <PlayButton>
-                    <img src="/images/play-icon-black.png" />
+                    <img src="/images/play-icon-black.png" alt="play"/>
                     <span>PLAY</span>
                 </PlayButton>
                 <TrailerButton>
-                <img src="/images/play-icon-white.png" />
+                <img src="/images/play-icon-white.png" alt="trailer"/>
                     <span>Trailer</span>
                 </TrailerButton>
                 <AddButton>
                     <span>+</span>
                 </AddButton>
                 <GroupWatch>
-                    <img src="/images/group-icon.png" />
+                    <img src="/images/group-icon.png" alt="watch"/>
                 </GroupWatch>
             </Controls>
             <SubTitle>
-                2018 * 7m * Family, Fantasy, Kids, Animation
+            {movie.subTitle}
             </SubTitle>
             <Description>
-                A Chinese mom who's sad when her grown son leaves home and gets another chance at motherhood when one of her dumplings springs to life. But she finds that nothing stays cute and small forever.
+            {movie.description}
             </Description>
+
+
+            </>
+        )
+        
+        
+        }
+            
         </Container>
     )
 }
@@ -136,6 +166,7 @@ const SubTitle = styled.div`
 
 const Description = styled.div`
     line-height: 1.4;
+    max-width: 50%;
     font-size: 20px;
     margin-top: 16px;
     color: rgb(249, 249, 249);
